@@ -1,5 +1,9 @@
 # JS Code Stats
 
+```bash
+npm install -g js-code-stats # or --save
+```
+
 JS Code Stats search your codebase and notify you of,
 
 * Invalid imports
