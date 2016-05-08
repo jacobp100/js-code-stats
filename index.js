@@ -24,8 +24,6 @@ exports.default = function (files) {
 
   var _ref$ignoreUnusedExpo = _ref.ignoreUnusedExports;
   var ignoreUnusedExports = _ref$ignoreUnusedExpo === undefined ? [] : _ref$ignoreUnusedExpo;
-  var _ref$exclude = _ref.exclude;
-  var exclude = _ref$exclude === undefined ? [] : _ref$exclude;
   var _ref$parser = _ref.parser;
   var parser = _ref$parser === undefined ? _getEsImportsExports.defaultParser : _ref$parser;
   var _ref$parserOptions = _ref.parserOptions;
@@ -38,7 +36,6 @@ exports.default = function (files) {
 
   return (0, _getEsImportsExports2.default)({
     files: resolvedFiles,
-    exclude: exclude,
     recurse: false,
     parser: parser,
     parserOptions: parserOptions,
@@ -50,9 +47,8 @@ exports.default = function (files) {
     var unusedFiles = (0, _fp.flow)((0, _fp.reject)((0, _fp.has)(_fp.__, imports)), (0, _fp.reject)((0, _fp.includes)(_fp.__, resolvedIgnoreUnusedExports)))(resolvedFiles);
 
     var getUnusedExports = function getUnusedExports(filename, fileExports) {
-      if ((0, _fp.includes)('*', imports[filename])) {
-        return [];
-      }
+      if ((0, _fp.includes)('*', imports[filename])) return [];
+
       return (0, _fp.flow)((0, _fp.reject)((0, _fp.includes)(_fp.__, imports[filename])), (0, _fp.reject)((0, _fp.equals)('*')))(fileExports);
     };
 
@@ -64,9 +60,29 @@ exports.default = function (files) {
       return [filename, getUnusedExports(filename, fileExports)];
     }), _fp.fromPairs, (0, _fp.omitBy)(_fp.isEmpty))(exports);
 
+    var getInvalidImports = function getInvalidImports(filename, fileImports) {
+      if ((0, _fp.includes)('*', exports[filename])) return [];
+
+      return (0, _fp.flow)((0, _fp.reject)((0, _fp.includes)(_fp.__, exports[filename])), (0, _fp.reject)('*'))(fileImports);
+    };
+
+    var invalidImports = (0, _fp.flow)(_fp.toPairs, (0, _fp.filter)(function (_ref5) {
+      var _ref6 = _slicedToArray(_ref5, 1);
+
+      var filename = _ref6[0];
+      return (0, _fp.has)(filename, exports);
+    }), (0, _fp.map)(function (_ref7) {
+      var _ref8 = _slicedToArray(_ref7, 2);
+
+      var filename = _ref8[0];
+      var fileImports = _ref8[1];
+      return [filename, getInvalidImports(filename, fileImports)];
+    }), _fp.fromPairs, (0, _fp.omitBy)(_fp.isEmpty))(imports);
+
     return {
       unusedFiles: unusedFiles,
-      unusedExports: unusedExports
+      unusedExports: unusedExports,
+      invalidImports: invalidImports
     };
   });
 };

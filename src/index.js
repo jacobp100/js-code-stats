@@ -1,6 +1,6 @@
 import {
   __, partial, flow, castArray, map, reject, toPairs, fromPairs, omit, has, includes,
-  omitBy, isEmpty, equals,
+  omitBy, isEmpty, equals, filter,
 } from 'lodash/fp';
 import { resolve } from 'path';
 import getEsImportsExports, { defaultParser, defaultParserOptions } from 'get-es-imports-exports';
@@ -33,9 +33,8 @@ export default (files, {
     )(resolvedFiles);
 
     const getUnusedExports = (filename, fileExports) => {
-      if (includes('*', imports[filename])) {
-        return [];
-      }
+      if (includes('*', imports[filename])) return [];
+
       return flow(
         reject(includes(__, imports[filename])),
         reject(equals('*'))
@@ -53,9 +52,30 @@ export default (files, {
       omitBy(isEmpty)
     )(exports);
 
+    const getInvalidImports = (filename, fileImports) => {
+      if (includes('*', exports[filename])) return [];
+
+      return flow(
+        reject(includes(__, exports[filename])),
+        reject('*')
+      )(fileImports);
+    };
+
+    const invalidImports = flow(
+      toPairs,
+      filter(([filename]) => has(filename, exports)),
+      map(([filename, fileImports]) => [
+        filename,
+        getInvalidImports(filename, fileImports),
+      ]),
+      fromPairs,
+      omitBy(isEmpty)
+    )(imports);
+
     return {
       unusedFiles,
       unusedExports,
+      invalidImports,
     };
   });
 };

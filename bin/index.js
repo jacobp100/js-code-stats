@@ -3,6 +3,7 @@
 
 'use strict';
 const _ = require('lodash/fp');
+const chalk = require('chalk');
 const yargs = require('yargs');
 const jsCodeStats = require('..').default;
 
@@ -19,9 +20,15 @@ const args = yargs
 jsCodeStats(args._, {
   ignoreUnusedExports: args.ignoreUnusedExports,
 }).then(stats => {
-  _.forEach(file => console.log(`File ${file} was never imported`), stats.unusedFiles);
+  _.forEach(pair => console.error(chalk.red(
+    `File ${pair[0]} attempted to import invalid imports: ${pair[1].join(', ')}`
+  )), _.toPairs(stats.invalidImports));
 
-  _.forEach(pair => (
-    console.log(`File ${pair[0]} defined unused exports: ${pair[1].join(', ')}`)
-  ), _.toPairs(stats.unusedExports));
+  _.forEach(file => console.log(chalk.yellow(
+    `File ${file} was never imported`
+  )), stats.unusedFiles);
+
+  _.forEach(pair => console.log(chalk.yellow(
+    `File ${pair[0]} defined unused exports: ${pair[1].join(', ')}`
+  )), _.toPairs(stats.unusedExports));
 });
