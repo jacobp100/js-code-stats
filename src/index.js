@@ -32,11 +32,11 @@ export default (files, {
       reject(includes(__, resolvedIgnoreUnusedExports))
     )(resolvedFiles);
 
-    const getUnusedExports = (filename, fileExports) => {
-      if (includes('*', imports[filename])) return [];
+    const getReferencedNames = (location, filename, fileExports) => {
+      if (includes('*', location[filename])) return [];
 
       return flow(
-        reject(includes(__, imports[filename])),
+        reject(includes(__, location[filename])),
         reject(equals('*'))
       )(fileExports);
     };
@@ -46,27 +46,18 @@ export default (files, {
       toPairs,
       map(([filename, fileExports]) => [
         filename,
-        getUnusedExports(filename, fileExports),
+        getReferencedNames(imports, filename, fileExports),
       ]),
       fromPairs,
       omitBy(isEmpty)
     )(exports);
-
-    const getInvalidImports = (filename, fileImports) => {
-      if (includes('*', exports[filename])) return [];
-
-      return flow(
-        reject(includes(__, exports[filename])),
-        reject('*')
-      )(fileImports);
-    };
 
     const invalidImports = flow(
       toPairs,
       filter(([filename]) => has(filename, exports)),
       map(([filename, fileImports]) => [
         filename,
-        getInvalidImports(filename, fileImports),
+        getReferencedNames(exports, filename, fileImports),
       ]),
       fromPairs,
       omitBy(isEmpty)

@@ -46,10 +46,10 @@ exports.default = function (files) {
 
     var unusedFiles = (0, _fp.flow)((0, _fp.reject)((0, _fp.has)(_fp.__, imports)), (0, _fp.reject)((0, _fp.includes)(_fp.__, resolvedIgnoreUnusedExports)))(resolvedFiles);
 
-    var getUnusedExports = function getUnusedExports(filename, fileExports) {
-      if ((0, _fp.includes)('*', imports[filename])) return [];
+    var getReferencedNames = function getReferencedNames(location, filename, fileExports) {
+      if ((0, _fp.includes)('*', location[filename])) return [];
 
-      return (0, _fp.flow)((0, _fp.reject)((0, _fp.includes)(_fp.__, imports[filename])), (0, _fp.reject)((0, _fp.equals)('*')))(fileExports);
+      return (0, _fp.flow)((0, _fp.reject)((0, _fp.includes)(_fp.__, location[filename])), (0, _fp.reject)((0, _fp.equals)('*')))(fileExports);
     };
 
     var unusedExports = (0, _fp.flow)((0, _fp.omit)(resolvedIgnoreUnusedExports), _fp.toPairs, (0, _fp.map)(function (_ref3) {
@@ -57,14 +57,8 @@ exports.default = function (files) {
 
       var filename = _ref4[0];
       var fileExports = _ref4[1];
-      return [filename, getUnusedExports(filename, fileExports)];
+      return [filename, getReferencedNames(imports, filename, fileExports)];
     }), _fp.fromPairs, (0, _fp.omitBy)(_fp.isEmpty))(exports);
-
-    var getInvalidImports = function getInvalidImports(filename, fileImports) {
-      if ((0, _fp.includes)('*', exports[filename])) return [];
-
-      return (0, _fp.flow)((0, _fp.reject)((0, _fp.includes)(_fp.__, exports[filename])), (0, _fp.reject)('*'))(fileImports);
-    };
 
     var invalidImports = (0, _fp.flow)(_fp.toPairs, (0, _fp.filter)(function (_ref5) {
       var _ref6 = _slicedToArray(_ref5, 1);
@@ -76,7 +70,7 @@ exports.default = function (files) {
 
       var filename = _ref8[0];
       var fileImports = _ref8[1];
-      return [filename, getInvalidImports(filename, fileImports)];
+      return [filename, getReferencedNames(exports, filename, fileImports)];
     }), _fp.fromPairs, (0, _fp.omitBy)(_fp.isEmpty))(imports);
 
     return {

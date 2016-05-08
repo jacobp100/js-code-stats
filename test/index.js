@@ -82,7 +82,7 @@ test.serial('namespace exports does not export the string "*"', t => {
   });
 });
 
-test.only('invalid import', t => {
+test.serial('invalid import', t => {
   t.plan(5);
 
   return jsCodeStats([
