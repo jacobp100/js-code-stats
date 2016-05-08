@@ -1,6 +1,6 @@
 import {
   __, partial, flow, castArray, map, reject, toPairs, fromPairs, omit, has, includes,
-  omitBy, isEmpty, equals, filter,
+  omitBy, isEmpty, equals, curry,
 } from 'lodash/fp';
 import { resolve } from 'path';
 import getEsImportsExports, { defaultParser, defaultParserOptions } from 'get-es-imports-exports';
@@ -27,11 +27,6 @@ export default (files, {
     parserOptions,
     resolveOptions,
   }).then(({ imports, exports }) => {
-    const unusedFiles = flow(
-      reject(has(__, imports)),
-      reject(includes(__, resolvedIgnoreUnusedExports))
-    )(resolvedFiles);
-
     const getReferencedNames = (location, filename, fileExports) => {
       if (includes('*', location[filename])) return [];
 
@@ -41,27 +36,27 @@ export default (files, {
       )(fileExports);
     };
 
-    const unusedExports = flow(
-      omit(resolvedIgnoreUnusedExports),
+    const compareTo = curry((locationToCompareTo, currentLocation) => flow(
       toPairs,
       map(([filename, fileExports]) => [
         filename,
-        getReferencedNames(imports, filename, fileExports),
+        getReferencedNames(locationToCompareTo, filename, fileExports),
       ]),
       fromPairs,
       omitBy(isEmpty)
+    )(currentLocation));
+
+    const unusedFiles = flow(
+      reject(has(__, imports)),
+      reject(includes(__, resolvedIgnoreUnusedExports))
+    )(resolvedFiles);
+
+    const unusedExports = flow(
+      omit(resolvedIgnoreUnusedExports),
+      compareTo(imports)
     )(exports);
 
-    const invalidImports = flow(
-      toPairs,
-      filter(([filename]) => has(filename, exports)),
-      map(([filename, fileImports]) => [
-        filename,
-        getReferencedNames(exports, filename, fileImports),
-      ]),
-      fromPairs,
-      omitBy(isEmpty)
-    )(imports);
+    const invalidImports = compareTo(exports, imports);
 
     return {
       unusedFiles,

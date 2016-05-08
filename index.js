@@ -44,34 +44,27 @@ exports.default = function (files) {
     var imports = _ref2.imports;
     var exports = _ref2.exports;
 
-    var unusedFiles = (0, _fp.flow)((0, _fp.reject)((0, _fp.has)(_fp.__, imports)), (0, _fp.reject)((0, _fp.includes)(_fp.__, resolvedIgnoreUnusedExports)))(resolvedFiles);
-
     var getReferencedNames = function getReferencedNames(location, filename, fileExports) {
       if ((0, _fp.includes)('*', location[filename])) return [];
 
       return (0, _fp.flow)((0, _fp.reject)((0, _fp.includes)(_fp.__, location[filename])), (0, _fp.reject)((0, _fp.equals)('*')))(fileExports);
     };
 
-    var unusedExports = (0, _fp.flow)((0, _fp.omit)(resolvedIgnoreUnusedExports), _fp.toPairs, (0, _fp.map)(function (_ref3) {
-      var _ref4 = _slicedToArray(_ref3, 2);
+    var compareTo = (0, _fp.curry)(function (locationToCompareTo, currentLocation) {
+      return (0, _fp.flow)(_fp.toPairs, (0, _fp.map)(function (_ref3) {
+        var _ref4 = _slicedToArray(_ref3, 2);
 
-      var filename = _ref4[0];
-      var fileExports = _ref4[1];
-      return [filename, getReferencedNames(imports, filename, fileExports)];
-    }), _fp.fromPairs, (0, _fp.omitBy)(_fp.isEmpty))(exports);
+        var filename = _ref4[0];
+        var fileExports = _ref4[1];
+        return [filename, getReferencedNames(locationToCompareTo, filename, fileExports)];
+      }), _fp.fromPairs, (0, _fp.omitBy)(_fp.isEmpty))(currentLocation);
+    });
 
-    var invalidImports = (0, _fp.flow)(_fp.toPairs, (0, _fp.filter)(function (_ref5) {
-      var _ref6 = _slicedToArray(_ref5, 1);
+    var unusedFiles = (0, _fp.flow)((0, _fp.reject)((0, _fp.has)(_fp.__, imports)), (0, _fp.reject)((0, _fp.includes)(_fp.__, resolvedIgnoreUnusedExports)))(resolvedFiles);
 
-      var filename = _ref6[0];
-      return (0, _fp.has)(filename, exports);
-    }), (0, _fp.map)(function (_ref7) {
-      var _ref8 = _slicedToArray(_ref7, 2);
+    var unusedExports = (0, _fp.flow)((0, _fp.omit)(resolvedIgnoreUnusedExports), compareTo(imports))(exports);
 
-      var filename = _ref8[0];
-      var fileImports = _ref8[1];
-      return [filename, getReferencedNames(exports, filename, fileImports)];
-    }), _fp.fromPairs, (0, _fp.omitBy)(_fp.isEmpty))(imports);
+    var invalidImports = compareTo(exports, imports);
 
     return {
       unusedFiles: unusedFiles,
