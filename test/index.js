@@ -47,3 +47,32 @@ test.serial('unused file', t => {
     t.deepEqual(values(unusedExports), [['unusedCExport']]);
   });
 });
+
+test.serial('namespace imports count as all exports being used', t => {
+  t.plan(2);
+
+  return jsCodeStats([
+    'namespace-import/a.js',
+    'namespace-import/b.js',
+  ], {
+    ignoreUnusedExports: 'namespace-import/a.js',
+  }).then(({ unusedFiles, unusedExports }) => {
+    t.is(size(unusedFiles), 0);
+    t.is(size(unusedExports), 0);
+  });
+});
+
+test.serial('namespace exports does not export the string "*"', t => {
+  t.plan(2);
+
+  return jsCodeStats([
+    'namespace-export/a.js',
+    'namespace-export/b.js',
+    'namespace-export/c.js',
+  ], {
+    ignoreUnusedExports: 'namespace-export/a.js',
+  }).then(({ unusedFiles, unusedExports }) => {
+    t.is(size(unusedFiles), 0);
+    t.is(size(unusedExports), 0);
+  });
+});
