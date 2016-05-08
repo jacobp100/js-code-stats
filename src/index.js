@@ -13,7 +13,6 @@ const resolveRelatives = flow(
 
 export default (files, {
   ignoreUnusedExports = [],
-  exclude = [],
   parser = defaultParser,
   parserOptions = defaultParserOptions,
   resolveOptions = {},
@@ -23,7 +22,6 @@ export default (files, {
 
   return getEsImportsExports({
     files: resolvedFiles,
-    exclude,
     recurse: false,
     parser,
     parserOptions,
