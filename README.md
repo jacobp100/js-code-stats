@@ -2,7 +2,7 @@
 
 JS Code Stats search your codebase and notify you of,
 
-* Invalid imports 
+* Invalid imports
 * Unused files
 * Unused exports
 

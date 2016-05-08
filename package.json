@@ -1,6 +1,6 @@
 {
   "name": "js-code-stats",
-  "version": "1.0.0",
+  "version": "0.0.1",
   "description": "",
   "main": "index.js",
   "scripts": {
@@ -11,7 +11,17 @@
     "type": "git",
     "url": "git+https://github.com/jacobp100/js-code-stats.git"
   },
-  "keywords": [],
+  "keywords": [
+    "ecmascript",
+    "es6",
+    "es",
+    "AST",
+    "dependency",
+    "dependencies",
+    "analizer",
+    "import",
+    "export"
+  ],
   "author": "",
   "license": "ISC",
   "bugs": {
@@ -41,5 +51,8 @@
       "babel-register"
     ],
     "babel": "inherit"
+  },
+  "bin": {
+    "js-code-stats": "./bin/index.js"
   }
 }
