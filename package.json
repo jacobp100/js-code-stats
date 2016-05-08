@@ -1,6 +1,6 @@
 {
   "name": "js-code-stats",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "",
   "main": "index.js",
   "scripts": {
@@ -39,7 +39,7 @@
   },
   "dependencies": {
     "chalk": "^1.1.3",
-    "get-es-imports-exports": "^1.0.1",
+    "get-es-imports-exports": "^1.0.2",
     "lodash": "^4.11.2",
     "yargs": "^4.7.0"
   },
