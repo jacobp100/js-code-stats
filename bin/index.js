@@ -31,4 +31,7 @@ jsCodeStats(args._, {
   _.forEach(pair => console.log(chalk.yellow(
     `File ${pair[0]} defined unused exports: ${pair[1].join(', ')}`
   )), _.toPairs(stats.unusedExports));
+}).catch(e => {
+  console.error('Critical error');
+  console.error(e);
 });
