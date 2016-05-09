@@ -1,4 +1,4 @@
-#! /usr/local/bin/node
+#!/usr/bin/env node
 /* eslint strict: [0], no-console: [0], no-extra-parens: [0] */
 
 'use strict';
